@@ -46,11 +46,11 @@ print("raw_train_images.shape: ", raw_train_images.shape)
 print("raw_train_labels.shape: ", raw_train_labels.shape)
 
 # Get validation split
-train_images, val_images, y_train_label, y_val_label = train_test_split(raw_train_images, train_labels, test_size=0.75, shuffle=False)
+train_images, val_images, y_train_label, y_val_label = train_test_split(raw_train_images, train_labels, test_size=0.2, shuffle=False)
 
 # Reshape for CNN
-x_train_input_temp = train_images.reshape(10000,64,64,1).astype('float32')
-x_val_input_temp = val_images.reshape(30000,64,64,1).astype('float32')
+x_train_input_temp = train_images.reshape(32000,64,64,1).astype('float32')
+x_val_input_temp = val_images.reshape(8000,64,64,1).astype('float32')
 x_test_input_temp = raw_test_images.reshape(10000,64,64,1).astype('float32')
 
 print ('x_train:', x_train_input_temp.shape)
@@ -78,6 +78,12 @@ model.add(Dense(10, activation='softmax'))
 model = Sequential()
 
 model.add(Conv2D(filters=64,kernel_size=(5,5),padding='same',input_shape=(64,64,1),activation='relu'))
+model.add(Conv2D(filters=64,kernel_size=(5,5),padding='same',input_shape=(64,64,1),activation='relu'))
+model.add(MaxPool2D(pool_size=(2,2)))
+
+model.add(Conv2D(filters=32,kernel_size=(5,5),padding='same',input_shape=(64,64,1),activation='relu'))
+model.add(MaxPool2D(pool_size=(2,2)))
+
 model.add(Conv2D(filters=32,kernel_size=(5,5),padding='same',input_shape=(64,64,1),activation='relu'))
 model.add(MaxPool2D(pool_size=(2,2)))
 
@@ -107,10 +113,9 @@ model.add(Dense(10,activation='softmax'))
 
 model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-
 #--------------------------MODEL EXECUTION--------------------------------------
 
-batch_size = 128
+batch_size = 512
 epochs = 50
 
 #model.fit(x_train_input, y_train_label, validation_data=(x_val_input, y_val_label), epochs=3)
@@ -122,4 +127,3 @@ model.fit(x = x_train_input, y = y_train_label, validation_data=(x_val_input, y_
 prediction = model.predict_classes(x_test_input)
 
 prediction = pandas.DataFrame(prediction, columns=['Category']).to_csv('test_prediction.csv')
-
